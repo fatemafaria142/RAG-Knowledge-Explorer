@@ -33,7 +33,6 @@ RAG-Knowledge-Explorer is a Django-based backend designed to demonstrate and run
 - Server-Sent Events (SSE) for streaming responses
 - Redis (optional) for async tasks / Celery (configured via env if used)
 - Docker (optional Dockerfile included for container builds)
-- Pytest (test scaffolding / management commands included)
 
 ## High-level architecture
 
