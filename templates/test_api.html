@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Django API Test Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .endpoint-section {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+        }
+        .endpoint-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            background-color: #f5f5f5;
+            padding: 8px;
+            border-radius: 3px;
+        }
+        input, textarea {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 15px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        pre {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 10px;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        .response-area {
+            margin-top: 15px;
+        }
+        .file-input-container {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>LangGraph Django API Test Interface</h1>
+    
+    <!-- Document Upload Section -->
+    <div class="endpoint-section">
+        <div class="endpoint-title">POST /api/document-upload/</div>
+        <p>Upload a document and create a RAG session</p>
+        
+        <form id="document-upload-form">
+            <label for="doc-name">Session Name:</label>
+            <input type="text" id="doc-name" placeholder="Enter session name">
+            
+            <div class="file-input-container">
+                <label for="doc-file">Document File (TXT only):</label>
+                <input type="file" id="doc-file">
+            </div>
+            
+            <button type="submit">Upload Document</button>
+        </form>
+        
+        <div class="response-area">
+            <h4>Response:</h4>
+            <pre id="document-upload-response"></pre>
+        </div>
+    </div>
+    
+    <!-- Chat Section -->
+    <div class="endpoint-section">
+        <div class="endpoint-title">POST /api/chat/</div>
+        <p>Send a message to an existing RAG session</p>
+        
+        <form id="chat-form">
+            <label for="chat-session-id">Session ID:</label>
+            <input type="text" id="chat-session-id" placeholder="Enter session UUID">
+            
+            <label for="chat-message">Message:</label>
+            <textarea id="chat-message" rows="3" placeholder="Enter your message"></textarea>
+            
+            <button type="submit">Send Message</button>
+        </form>
+        
+        <div class="response-area">
+            <h4>Response:</h4>
+            <pre id="chat-response"></pre>
+        </div>
+    </div>
+    
+    <!-- Session Messages Section -->
+    <div class="endpoint-section">
+        <div class="endpoint-title">GET /api/session/{session_id}/messages/</div>
+        <p>Get all messages for a specific session</p>
+        
+        <form id="messages-form">
+            <label for="messages-session-id">Session ID:</label>
+            <input type="text" id="messages-session-id" placeholder="Enter session UUID">
+            
+            <button type="submit">Get Messages</button>
+        </form>
+        
+        <div class="response-area">
+            <h4>Response:</h4>
+            <pre id="messages-response"></pre>
+        </div>
+    </div>
+    
+    <!-- Session List Section -->
+    <div class="endpoint-section">
+        <div class="endpoint-title">GET /api/sessions/</div>
+        <p>List all available RAG sessions</p>
+        
+        <button id="sessions-btn">Get All Sessions</button>
+        
+        <div class="response-area">
+            <h4>Response:</h4>
+            <pre id="sessions-response"></pre>
+        </div>
+    </div>
+
+    <script>
+        // Helper function to display API responses
+        function displayResponse(elementId, data) {
+            document.getElementById(elementId).textContent = JSON.stringify(data, null, 2);
+        }
+
+        // Document Upload Form
+        document.getElementById('document-upload-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('name', document.getElementById('doc-name').value);
+            formData.append('file', document.getElementById('doc-file').files[0]);
+            
+            try {
+                const response = await fetch('/api/document-upload/', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                displayResponse('document-upload-response', result);
+            } catch (error) {
+                displayResponse('document-upload-response', { error: error.message });
+            }
+        });
+
+        // Chat Form
+        document.getElementById('chat-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const sessionId = document.getElementById('chat-session-id').value;
+            const message = document.getElementById('chat-message').value;
+            
+            try {
+                const response = await fetch('/api/chat/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        message: message
+                    })
+                });
+                
+                const result = await response.json();
+                displayResponse('chat-response', result);
+            } catch (error) {
+                displayResponse('chat-response', { error: error.message });
+            }
+        });
+
+        // Session Messages Form
+        document.getElementById('messages-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const sessionId = document.getElementById('messages-session-id').value;
+            
+            try {
+                const response = await fetch(`/api/session/${sessionId}/messages/`);
+                const result = await response.json();
+                displayResponse('messages-response', result);
+            } catch (error) {
+                displayResponse('messages-response', { error: error.message });
+            }
+        });
+
+        // Sessions Button
+        document.getElementById('sessions-btn').addEventListener('click', async function() {
+            try {
+                const response = await fetch('/api/sessions/');
+                const result = await response.json();
+                displayResponse('sessions-response', result);
+            } catch (error) {
+                displayResponse('sessions-response', { error: error.message });
+            }
+        });
+    </script>
+</body>
+</html>

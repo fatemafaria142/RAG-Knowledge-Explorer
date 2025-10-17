@@ -1,0 +1,25 @@
+Django==4.2.7
+djangorestframework==3.14.0
+django-cors-headers==4.3.1
+drf-yasg==1.21.11
+python-decouple==3.8
+psycopg2-binary==2.9.9
+langchain==0.2.16
+langchain-openai==0.1.23
+langchain-community==0.2.17
+langgraph==0.2.14
+pgvector==0.3.2
+# Fixed versions for Azure OpenAI compatibility
+openai==1.40.0
+httpx==0.24.1
+httpcore==0.17.3
+h11==0.14.0
+python-dotenv==1.0.0
+celery==5.3.4
+redis==5.0.1
+gunicorn==21.2.0
+whitenoise==6.6.0
+Pillow==10.1.0
+# Added for PDF and DOCX file support
+python-docx==0.8.11
+PyPDF2==3.0.1
